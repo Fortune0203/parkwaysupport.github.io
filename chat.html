@@ -194,8 +194,6 @@
       //     );
       //   });
 
-      const apiUrl = "https://pulse.parkwayprojects.xyz/api/pulse/createPulse";
-
       const bodyData = {
         product: "${product}",
         email: "${email}",
@@ -205,7 +203,7 @@
         // '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}", "File":"${file}"}',
       };
 
-      fetch(apiUrl, {
+      fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
