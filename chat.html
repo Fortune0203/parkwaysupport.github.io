@@ -143,56 +143,84 @@
       </div>
     </div>
     <script>
-      const bodyData = {
-        Data: {
-          Recipients: [
-            {
-              Value: "support@ppl.zendesk.com",
-              Type: 1,
-              Channel: 0,
-            },
-          ],
-          Params: {
-            Subject: "Request for Demo on Parkway",
-            Sender: "Parkway Rails <no-reply@parkway.ng>",
-            Params:
-              '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}"}',
-          },
-          Attachments: [],
-        },
-        Name: "demo.request",
-      };
-      if (attachments.length > 0) {
-        bodyData.Data.Attachments = attachments;
-      }
+      // const bodyData = {
+      //   Data: {
+      //     Recipients: [
+      //       {
+      //         Value: "support@ppl.zendesk.com",
+      //         Type: 1,
+      //         Channel: 0,
+      //       },
+      //     ],
+      //     Params: {
+      //       Subject: "Request for Demo on Parkway",
+      //       Sender: "Parkway Rails <no-reply@parkway.ng>",
+      //       Params:
+      //         '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}"}',
+      //     },
+      //     Attachments: [],
+      //   },
+      //   Name: "demo.request",
+      // };
+      // if (attachments.length > 0) {
+      //   bodyData.Data.Attachments = attachments;
+      // }
 
-      fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "pulse.origin": "Parkway.Default",
-        },
-        body: JSON.stringify(bodyData),
-      })
-        .then((data) => {
-          if (!data.ok) {
-            setFormMessage(
-              "Oops! An error occurred while sending. Please try again."
-            );
+      // fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "pulse.origin": "Parkway.Default",
+      //   },
+      //   body: JSON.stringify(bodyData),
+      // })
+      //   .then((data) => {
+      //     if (!data.ok) {
+      //       setFormMessage(
+      //         "Oops! An error occurred while sending. Please try again."
+      //       );
+      //     }
+      //     return data.json();
+      //   })
+      //   .then(() => {
+      //     setFormMessage(
+      //       "We got that! Someone from our team will reach to you"
+      //     );
+      //     reset();
+      //   })
+      //   .catch((e) => {
+      //     setFormMessage(
+      //       "Oops! An error occurred while sending. Please try again."
+      //     );
+      //   });
+
+      const apiUrl = "https://pulse.parkwayprojects.xyz/api/pulse/createPulse";
+
+      const formData = {
+          '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}", "File":"${file}"}',
+      };
+
+      fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            "pulse.origin": "Parkway.Default",
+          },
+          body: JSON.stringify(formData),
+        })
+          .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
           }
-          return data.json();
+          return response.json();
         })
-        .then(() => {
-          setFormMessage(
-            "We got that! Someone from our team will reach to you"
-          );
-          reset();
-        })
-        .catch((e) => {
-          setFormMessage(
-            "Oops! An error occurred while sending. Please try again."
-          );
-        });
+          .then(newUserData => {
+            // Process the newly created user data
+            console.log('New User Data:', newUserData);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
     </script>
   </body>
 </html>
