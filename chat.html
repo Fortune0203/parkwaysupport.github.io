@@ -196,31 +196,36 @@
 
       const apiUrl = "https://pulse.parkwayprojects.xyz/api/pulse/createPulse";
 
-      const formData = {
-          '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}", "File":"${file}"}',
+      const bodyData = {
+        product: "${product}",
+        email: "${email}",
+        subject: "${subject}",
+        description: "${description}",
+        file: "${file}",
+        // '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}", "File":"${file}"}',
       };
 
       fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            "pulse.origin": "Parkway.Default",
-          },
-          body: JSON.stringify(formData),
-        })
-          .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "pulse.origin": "Parkway.Default",
+        },
+        body: JSON.stringify(bodyData),
+      })
+        .then((bodyData) => {
+          if (!bodyData.ok) {
+            throw new Error("Network response was not ok");
           }
-          return response.json();
+          return bodyData.json();
         })
-          .then(newUserData => {
-            // Process the newly created user data
-            console.log('New User Data:', newUserData);
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
+        .then((newUserData) => {
+          // Process the newly created user data
+          console.log("New User Data:", newUserData);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     </script>
   </body>
 </html>
