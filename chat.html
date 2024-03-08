@@ -195,12 +195,14 @@
       //   });
 
       const bodyData = {
-        product: "${product}",
-        email: "${email}",
-        subject: "${subject}",
-        description: "${description}",
-        file: "${file}",
-        // '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}", "File":"${file}"}',
+        Data: {
+          product: "${product}",
+          email: "${email}",
+          subject: "${subject}",
+          description: "${description}",
+          file: "${file}",
+          // '{"Product":"${product}", "EmailAddress":"${email}","Subject":"${subject}", "Description":"${description}", "File":"${file}"}',
+        },
       };
 
       fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
@@ -211,18 +213,24 @@
         },
         body: JSON.stringify(bodyData),
       })
-        .then((bodyData) => {
-          if (!bodyData.ok) {
-            throw new Error("Network response was not ok");
+        .then((data) => {
+          if (!data.ok) {
+            setFormMessage(
+              "Oops! An error occurred while sending. Please try again."
+            );
           }
-          return bodyData.json();
+          return data.json();
         })
-        .then((newUserData) => {
-          // Process the newly created user data
-          console.log("New User Data:", newUserData);
+        .then(() => {
+          setFormMessage(
+            "We got that! Someone from our team will reach to you"
+          );
+          reset();
         })
-        .catch((error) => {
-          console.error("Error:", error);
+        .catch((e) => {
+          setFormMessage(
+            "Oops! An error occurred while sending. Please try again."
+          );
         });
     </script>
   </body>
