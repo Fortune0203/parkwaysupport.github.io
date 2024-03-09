@@ -88,6 +88,215 @@
   <body>
     <div class="container">
       <div class="image-container">
+        <!-- Your existing image container content remains unchanged -->
+      </div>
+      <div class="form-container" style="width: 580px">
+        <form id="myForm" style="padding: 40px">
+          <!-- Your existing form content remains unchanged -->
+
+          <div id="form-message">
+            <!-- The form message container -->
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function setFormMessage(message, isError = false) {
+        const messageElement = document.getElementById("form-message");
+
+        // Check if the element exists
+        if (messageElement) {
+          // Clear any existing messages
+          messageElement.innerHTML = "";
+
+          // Create a new message element
+          const newMessage = document.createElement("div");
+          newMessage.textContent = message;
+
+          // Add a class based on whether it's an error or success message
+          if (isError) {
+            newMessage.classList.add("error-message");
+          } else {
+            newMessage.classList.add("success-message");
+          }
+
+          // Append the message to the message element
+          messageElement.appendChild(newMessage);
+        } else {
+          console.error("Element with ID 'form-message' not found.");
+        }
+      }
+
+      // Function to handle form submission
+      function submitForm() {
+        const product = document.getElementById("product").value;
+        const email = document.getElementById("email").value;
+        const subject = document.getElementById("subject").value;
+        const description = document.getElementById("description").value;
+        const fileInput = document.getElementById("file");
+        const file = fileInput.files[0];
+
+        const bodyData = {
+          Data: {
+            Recipients: [
+              {
+                Value: "support@ppl.zendesk.com",
+                Type: 1,
+                Channel: 0,
+              },
+            ],
+            Params: {
+              Subject: "Request for Demo on Parkway",
+              Sender: "Parkway Rails <no-reply@parkway.ng>",
+              Params: `{"Product":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
+            },
+            Attachments: [],
+          },
+          Name: "demo.request",
+        };
+
+        // Check if Attachments are provided
+        if (file) {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          // Append the file to the Attachments array
+          bodyData.Data.Attachments.push(formData);
+        }
+
+        fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
+          method: "POST",
+          headers: {
+            "pulse.origin": "Parkway.Default",
+          },
+          body: JSON.stringify(bodyData),
+        })
+          .then((data) => {
+            if (!data.ok) {
+              setFormMessage(
+                "Oops! An error occurred while sending. Please try again.",
+                true
+              );
+            }
+            return data.json();
+          })
+          .then(() => {
+            setFormMessage(
+              "We got that! Someone from our team will reach out to you."
+            );
+            // Reset the form if needed
+            // reset();
+          })
+          .catch((e) => {
+            setFormMessage(
+              "Oops! An error occurred while sending. Please try again.",
+              true
+            );
+          });
+      }
+
+      // Event listener for form submission
+      document
+        .getElementById("myForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          submitForm();
+        });
+    </script>
+  </body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      @font-face {
+        font-family: myFont;
+        src: url(./fonts/PPRightGothic-WideMedium.woff);
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+      }
+
+      .image-container {
+        flex: 1;
+        padding: 0px;
+        height: 100%;
+      }
+
+      .form-container {
+        flex: 2;
+        padding: 0px;
+        box-sizing: border-box;
+        background: #fff;
+      }
+
+      img {
+        width: 100%;
+        display: block;
+        height: 100%;
+      }
+
+      form {
+        background-color: #fff;
+        padding: 0px;
+        border-radius: 0px;
+      }
+      select {
+        width: calc(100% - 16px); /* Adjust the width as needed */
+        height: 30px;
+        border: 1px solid black;
+        border-radius: 4px;
+      }
+      input {
+        width: calc(100% - 16px); /* Adjust the width as needed */
+        border: 1px solid black;
+        border-radius: 4px;
+        height: 30px;
+      }
+      textarea {
+        width: 98%;
+      }
+
+      .form-group {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .form-group label {
+        display: block;
+        padding-bottom: 10px;
+      }
+
+      .form-btn {
+        margin-top: 30px;
+      }
+      @media screen and (max-width: 768px) {
+        .image-container {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="image-container">
         <img src="form_img.png" alt="Image" />
       </div>
       <div class="form-container" style="width: 580px">
@@ -196,72 +405,73 @@
           );
         });
 
-      //       const bodyData = {
-      //         Data: {
-      //           product: "${product}",
-      //           email: "${email}",
-      //           subject: "${subject}",
-      //           description: "${description}",
-      //           file: "${file}",
-      // },
-      //       };
 
-      //       // Assuming setFormMessage is defined in the same scope or imported correctly
-
-      //       // Define setFormMessage function in the same scope
-      //       function setFormMessage(message, isError = false) {
-      //         // Get a reference to the HTML element where you want to display messages
-      //         const messageElement = document.getElementById("form-message");
-
-      //         // Clear any existing messages
-      //         messageElement.innerHTML = "";
-
-      //         // Create a new message element
-      //         const newMessage = document.createElement("div");
-      //         newMessage.textContent = message;
-
-      //         // Add a class based on whether it's an error or success message
-      //         if (isError) {
-      //           newMessage.classList.add("error-message");
-      //         } else {
-      //           newMessage.classList.add("success-message");
-      //         }
-
-      //         // Append the message to the message element
-      //         messageElement.appendChild(newMessage);
-      //       }
-
-      //       // Your fetch request
-      //       fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
-      //         method: "POST",
-      //         headers: {
-      //           "Content-Type": "application/json",
-      //           "pulse.origin": "Parkway.Default",
-      //         },
-      //         body: JSON.stringify(bodyData),
-      //       })
-      //         .then((data) => {
-      //           if (!data.ok) {
-      //             setFormMessage(
-      //               "Oops! An error occurred while sending. Please try again.",
-      //               true // isError is set to true for error messages
-      //             );
-      //           }
-      //           return data.json();
-      //         })
-      //         .then(() => {
-      //           setFormMessage(
-      //             "We got that! Someone from our team will reach out to you."
-      //           );
-      //           reset(); // Assuming reset function is defined elsewhere
-      //         })
-      //         .catch((error) => {
-      //           console.error("Error during fetch:", error);
-      //           setFormMessage(
-      //             "Oops! An error occurred while sending. Please try again.",
-      //             true // isError is set to true for error messages
-      //           );
-      //         });
+        //       const bodyData = {
+          //         Data: {
+          //           product: "${product}",
+          //           email: "${email}",
+          //           subject: "${subject}",
+          //           description: "${description}",
+          //           file: "${file}",
+          // },
+          //       };
+        
+          //       // Assuming setFormMessage is defined in the same scope or imported correctly
+        
+          //       // Define setFormMessage function in the same scope
+          //       function setFormMessage(message, isError = false) {
+          //         // Get a reference to the HTML element where you want to display messages
+          //         const messageElement = document.getElementById("form-message");
+        
+          //         // Clear any existing messages
+          //         messageElement.innerHTML = "";
+        
+          //         // Create a new message element
+          //         const newMessage = document.createElement("div");
+          //         newMessage.textContent = message;
+        
+          //         // Add a class based on whether it's an error or success message
+          //         if (isError) {
+          //           newMessage.classList.add("error-message");
+          //         } else {
+          //           newMessage.classList.add("success-message");
+          //         }
+        
+          //         // Append the message to the message element
+          //         messageElement.appendChild(newMessage);
+          //       }
+        
+          //       // Your fetch request
+          //       fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
+          //         method: "POST",
+          //         headers: {
+          //           "Content-Type": "application/json",
+          //           "pulse.origin": "Parkway.Default",
+          //         },
+          //         body: JSON.stringify(bodyData),
+          //       })
+          //         .then((data) => {
+          //           if (!data.ok) {
+          //             setFormMessage(
+          //               "Oops! An error occurred while sending. Please try again.",
+          //               true // isError is set to true for error messages
+          //             );
+          //           }
+          //           return data.json();
+          //         })
+          //         .then(() => {
+          //           setFormMessage(
+          //             "We got that! Someone from our team will reach out to you."
+          //           );
+          //           reset(); // Assuming reset function is defined elsewhere
+          //         })
+          //         .catch((error) => {
+          //           console.error("Error during fetch:", error);
+          //           setFormMessage(
+          //             "Oops! An error occurred while sending. Please try again.",
+          //             true // isError is set to true for error messages
+          //           );
+          //         });
     </script>
   </body>
-</html>
+</html> -->
