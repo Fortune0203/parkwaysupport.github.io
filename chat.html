@@ -232,14 +232,14 @@
                 true
               );
             });
-        };
 
-        document
-          .getElementById("myForm")
-          .addEventListener("submit", function (event) {
-            event.preventDefault();
-            submitForm();
-          });
+          document
+            .getElementById("myForm")
+            .addEventListener("submit", function (event) {
+              event.preventDefault();
+              submitForm();
+            });
+        };
       }
       reader.readAsDataURL(file);
     </script>
