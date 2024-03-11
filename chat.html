@@ -177,64 +177,71 @@
         const fileInput = document.getElementById("file");
         const file = fileInput.files[0];
 
-        const bodyData = new FormData();
-        bodyData.append(
-          "Recipients",
-          JSON.stringify([
-            {
-              Value: "support@ppl.zendesk.com",
-              Type: 1,
-              Channel: 0,
-            },
-          ])
-        );
-        bodyData.append(
-          "Params",
-          JSON.stringify({
-            Subject: "Request for Demo on Parkway",
-            Sender: "Parkway Rails <no-reply@parkway.ng>",
-            Params: `{"Product":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
-          })
-        );
-        bodyData.append("Name", "demo.request");
-        bodyData.append("Attachments", file);
+        const reader = new FileReader();
 
-        fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
-          method: "POST",
-          headers: {
-            "pulse.origin": "Parkway.Default",
-          },
-          body: bodyData,
-        })
-          .then((data) => {
-            if (!data.ok) {
+        reader.onload = function () {
+          const base64File = reader.result.split(",")[1];
+
+          const bodyData = new FormData();
+          bodyData.append(
+            "Recipients",
+            JSON.stringify([
+              {
+                Value: "support@ppl.zendesk.com",
+                Type: 1,
+                Channel: 0,
+              },
+            ])
+          );
+          bodyData.append(
+            "Params",
+            JSON.stringify({
+              Subject: "Request for Demo on Parkway",
+              Sender: "Parkway Rails <no-reply@parkway.ng>",
+              Params: `{"Product":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}" "Attachments":"${base64File}"}`,
+            })
+          );
+          bodyData.append("Name", "demo.request");
+          // bodyData.append("Attachments", file);
+
+          fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
+            method: "POST",
+            headers: {
+              "pulse.origin": "Parkway.Default",
+            },
+            body: bodyData,
+          })
+            .then((data) => {
+              if (!data.ok) {
+                setFormMessage(
+                  "Oops! An error occurred while sending. Please try again.",
+                  true
+                );
+              }
+              return data.json();
+            })
+            .then(() => {
+              setFormMessage(
+                "We got that! Someone from our team will reach out to you."
+              );
+              // reset();
+            })
+            .catch((e) => {
               setFormMessage(
                 "Oops! An error occurred while sending. Please try again.",
                 true
               );
-            }
-            return data.json();
-          })
-          .then(() => {
-            setFormMessage(
-              "We got that! Someone from our team will reach out to you."
-            );
-            // reset();  // Uncomment if you have a reset function
-          })
-          .catch((e) => {
-            setFormMessage(
-              "Oops! An error occurred while sending. Please try again.",
-              true
-            );
+            });
+        };
+
+        document
+          .getElementById("myForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            submitForm();
           });
       }
-
-      document
-        .getElementById("myForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          submitForm();
-        });
+      reader.readAsDataURL(file);
     </script>
   </body>
 </html>
