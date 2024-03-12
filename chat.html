@@ -50,13 +50,13 @@
         border-radius: 0px;
       }
       select {
-        width: calc(100% - 16px); /* Adjust the width as needed */
+        width: calc(100% - 16px);
         height: 30px;
         border: 1px solid black;
         border-radius: 4px;
       }
       input {
-        width: calc(100% - 16px); /* Adjust the width as needed */
+        width: calc(100% - 16px);
         border: 1px solid black;
         border-radius: 4px;
         height: 30px;
@@ -137,6 +137,7 @@
                 border-radius: 26px;
                 background-color: #f9956b;
               "
+              id="submit"
             >
               Submit
             </button>
@@ -144,8 +145,6 @@
         </form>
       </div>
     </div>
-
-    <!-- Your existing HTML remains unchanged -->
 
     <script>
       function setFormMessage(message, isError = false) {
@@ -169,35 +168,14 @@
         }
       }
 
-      function submitForm() {
+      document.getElementById("submit").addEventListener("click", function (e) {
+        e.preventDefault();
         const product = document.getElementById("product").value;
         const email = document.getElementById("email").value;
         const subject = document.getElementById("subject").value;
         const description = document.getElementById("description").value;
         const fileInput = document.getElementById("file");
         const file = fileInput.files[0];
-
-        // const bodyData = new FormData();
-        // bodyData.append(
-        //   "Recipients",
-        //   JSON.stringify([
-        //     {
-        //       Value: "support@ppl.zendesk.com",
-        //       Type: 1,
-        //       Channel: 0,
-        //     },
-        //   ])
-        // );
-        // bodyData.append(
-        //   "Params",
-        //   JSON.stringify({
-        //     Subject: "Request for Demo on Parkway",
-        //     Sender: "Parkway Rails <no-reply@parkway.ng>",
-        //     Params: `{"Product":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
-        //   })
-        // );
-        // bodyData.append("Name", "demo.request");
-        // bodyData.append("Attachments", file);
 
         const bodyData = {
           Data: {
@@ -211,9 +189,9 @@
             Params: {
               Subject: "Request for Demo on Parkway Rails",
               Sender: "Parkway Rails <no-reply@parkway.ng>",
-              Params: `{"Fullname":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
+              Params: `{"product":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
             },
-            Attachments: {},
+            Attachments: { file },
           },
           Name: "demo.request",
         };
@@ -238,7 +216,65 @@
             setFormMessage(
               "We got that! Someone from our team will reach out to you."
             );
-            reset();
+            // reset();
+          })
+          .catch((e) => {
+            setFormMessage(
+              "Oops! An error occurred while sending. Please try again.",
+              true
+            );
+          });
+      });
+
+      function submitForm() {
+        const product = document.getElementById("product").value;
+        const email = document.getElementById("email").value;
+        const subject = document.getElementById("subject").value;
+        const description = document.getElementById("description").value;
+        const fileInput = document.getElementById("file");
+        const file = fileInput.files[0];
+
+        const bodyData = {
+          Data: {
+            Recipients: [
+              {
+                Value: "reachout@parkway.ng",
+                Type: 1,
+                Channel: 0,
+              },
+            ],
+            Params: {
+              Subject: "Request for Demo on Parkway Rails",
+              Sender: "Parkway Rails <no-reply@parkway.ng>",
+              Params: `{"Fullname":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
+            },
+            Attachments: {},
+          },
+          Name: "demo.request",
+        };
+        console.log(bodyData);
+
+        fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "pulse.origin": "Parkway.Default",
+          },
+          body: JSON.stringify(bodyData),
+        })
+          .then((data) => {
+            if (!data.ok) {
+              setFormMessage(
+                "Oops! An error occurred while sending. Please try again."
+              );
+            }
+            return data.json();
+          })
+          .then(() => {
+            setFormMessage(
+              "We got that! Someone from our team will reach out to you."
+            );
+            // reset();
           })
           .catch((e) => {
             setFormMessage(
@@ -247,13 +283,6 @@
             );
           });
       }
-
-      // document
-      //   .getElementById("myForm")
-      //   .addEventListener("submit", function (event) {
-      //     event.preventDefault();
-      //     submitForm();
-      //   });
     </script>
   </body>
 </html>
