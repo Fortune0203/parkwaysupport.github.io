@@ -147,141 +147,71 @@
     </div>
 
     <script>
-      function setFormMessage(message, isError = false) {
-        const messageElement = document.getElementById("form-message");
+      const form = document.querySelector("#myForm");
+      const fileInput = document.querySelector("#file");
 
-        if (messageElement) {
-          messageElement.innerHTML = "";
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const formData = new FormData(form);
 
-          const newMessage = document.createElement("div");
-          newMessage.textContent = message;
-
-          if (isError) {
-            newMessage.classList.add("error-message");
-          } else {
-            newMessage.classList.add("success-message");
-          }
-
-          messageElement.appendChild(newMessage);
-        } else {
-          console.error("Element with ID 'form-message' not found.");
-        }
-      }
-
-      document.getElementById("submit").addEventListener("click", function (e) {
-        e.preventDefault();
-        const product = document.getElementById("product").value;
-        const email = document.getElementById("email").value;
-        const subject = document.getElementById("subject").value;
-        const description = document.getElementById("description").value;
-        const fileInput = document.getElementById("file");
         const file = fileInput.files[0];
 
-        const bodyData = {
-          Data: {
-            Recipients: [
-              {
-                Value: "reachout@parkway.ng",
-                Type: 1,
-                Channel: 0,
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async function () {
+            const base64String = reader.result.split(",")[1];
+            const bodyData = {
+              Data: {
+                Recipients: [
+                  {
+                    Value: "support@ppl.zendesk.com",
+                    Type: 1,
+                    Channel: 0,
+                  },
+                ],
+                Params: {
+                  Subject: "Request for Demo on Parkway Rails",
+                  Sender: "Parkway Rails <no-reply@parkway.ng>",
+                  Params: JSON.stringify({
+                    product: formData.get("product"),
+                    EmailAddress: formData.get("email"),
+                    Subject: formData.get("subject"),
+                    Description: formData.get("description"),
+                  }),
+                },
+                Attachments: {
+                  [file.name]: base64String,
+                },
               },
-            ],
-            Params: {
-              Subject: "Request for Demo on Parkway Rails",
-              Sender: "Parkway Rails <no-reply@parkway.ng>",
-              Params: `{"product":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
-            },
-            Attachments: { file },
-          },
-          Name: "demo.request",
-        };
+              Name: "support.request",
+            };
 
-        fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "pulse.origin": "Parkway.Default",
-          },
-          body: JSON.stringify(bodyData),
-        })
-          .then((data) => {
-            if (!data.ok) {
-              setFormMessage(
-                "Oops! An error occurred while sending. Please try again."
-              );
-            }
-            return data.json();
-          })
-          .then(() => {
-            setFormMessage(
-              "We got that! Someone from our team will reach out to you."
-            );
-            // reset();
-          })
-          .catch((e) => {
-            setFormMessage(
-              "Oops! An error occurred while sending. Please try again.",
-              true
-            );
-          });
+            sendDataToServer(bodyData);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          console.log("No file selected");
+        }
       });
 
-      function submitForm() {
-        const product = document.getElementById("product").value;
-        const email = document.getElementById("email").value;
-        const subject = document.getElementById("subject").value;
-        const description = document.getElementById("description").value;
-        const fileInput = document.getElementById("file");
-        const file = fileInput.files[0];
-
-        const bodyData = {
-          Data: {
-            Recipients: [
-              {
-                Value: "reachout@parkway.ng",
-                Type: 1,
-                Channel: 0,
+      async function sendDataToServer(data) {
+        try {
+          const response = await fetch(
+            "http://pulse.parkwayprojects.xyz/api/pulse/createPulse",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "pulse.origin": "Parkway.Default",
               },
-            ],
-            Params: {
-              Subject: "Request for Demo on Parkway Rails",
-              Sender: "Parkway Rails <no-reply@parkway.ng>",
-              Params: `{"Fullname":"${product}", "EmailAddress":"${email}", "Subject":"${subject}", "Description":"${description}"}`,
-            },
-            Attachments: {},
-          },
-          Name: "demo.request",
-        };
-        console.log(bodyData);
-
-        fetch("https://pulse.parkwayprojects.xyz/api/pulse/createPulse", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "pulse.origin": "Parkway.Default",
-          },
-          body: JSON.stringify(bodyData),
-        })
-          .then((data) => {
-            if (!data.ok) {
-              setFormMessage(
-                "Oops! An error occurred while sending. Please try again."
-              );
+              body: JSON.stringify(data),
             }
-            return data.json();
-          })
-          .then(() => {
-            setFormMessage(
-              "We got that! Someone from our team will reach out to you."
-            );
-            reset();
-          })
-          .catch((e) => {
-            setFormMessage(
-              "Oops! An error occurred while sending. Please try again.",
-              true
-            );
-          });
+          );
+          const result = await response.json();
+          console.log("Success:", result);
+        } catch (error) {
+          console.error("Error:", error);
+        }
       }
     </script>
   </body>
